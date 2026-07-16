@@ -41,7 +41,6 @@ function run() {
 
 	console.log(arr, qp, qp.code);
 	document.getElementById("code").textContent = qp.code;
-	qp.code = "";
 	if (qp.code) fetch("https://api.schwabapi.com/v1/oauth/token", {method:'POST', 
 		body:new URLSearchParams({"grant_type":"authorization_code", 
 			code:qp.code, "client_id":D('api').value, "redirect_uri":""}),
