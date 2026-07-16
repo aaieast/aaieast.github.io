@@ -1,4 +1,5 @@
 <!DOCTYPE html><title>aaieast</title>
+<button onclick="popout()">Schwab</button>
 Code: <span id="code"></span>
 <br><br>
 API: <input id="api">
@@ -32,6 +33,10 @@ D('URL').onkeydown = function() {
 		console.log(this.value);
 		localStorage.setItem('URL', this.value);
 	}
+}
+
+function popout() { 
+	window.location.href = "https://api.schwabapi.com/v1/oauth/authorize?response_type=code&client_id=" + D('api').value + "&scope=readonly&redirect_uri=" + D('URL').value;
 }
 
 function run() {
