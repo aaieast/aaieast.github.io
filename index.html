@@ -1,29 +1,58 @@
 <!DOCTYPE html><title>aaieast</title>
-<div id="code"></div>
+Code: <span id="code"></span>
+<br><br>
+API: <input id="api">
+<br><br>
+Hash: <input id="hash">
+<br><br>
+Refresh: 
+<br><span id="refresh"></span>
 
-<script>
-    'use strict';
-    function run () {
-        var qp, arr;
-        if (/code|token|error/.test(window.location.hash)) {
-    			console.log("window branch", window.location);
-    			qp = window.location.hash.substring(1);
-    		} else {
-    			console.log("location branch", location, location.search);
-    			qp = location.search.substring(1);
-    		}
+<script>'use strict';
+function D(str) { return document.getElementById(str); }
+D('api').value = localStorage.getItem('api') || "";
+D('hash').value = localStorage.getItem('hash') || "";
+D('api').onkeydown = function() {
+	if (event.keyCode == 13) {
+		console.log(this.value);
+		localStorage.setItem('api', this.value);
+	}
+}
+D('hash').onkeydown = function() {
+	if (event.keyCode == 13) {
+		console.log(this.value);
+		localStorage.setItem('hash', this.value);
+	}
+}
 
-        arr = qp.split("&");
-        arr.forEach(function (v,i,_arr) { _arr[i] = '"' + v.replace('=', '":"') + '"';});
-        qp = qp ? JSON.parse('{' + arr.join() + '}',
-                function (key, value) { return key === "" ? value : decodeURIComponent(value); }
-        ) : {};
+function run() {
+	var qp, arr;
+	if (/code|token|error/.test(window.location.hash)) {
+		console.log("window branch", window.location);
+		qp = window.location.hash.substring(1);
+	} else {
+		console.log("location branch", location, location.search);
+		qp = location.search.substring(1);
+	}
 
-    		console.log(arr, qp, qp.code);
-    		//window.opener.contentWindow.document.getElementById("child").textContent = "hi";
-        document.getElementById("code").textContent = qp.code;
-    }
+	arr = qp.split("&");
+	arr.forEach(function (v,i,_arr) { _arr[i] = '"' + v.replace('=', '":"') + '"';});
+	qp = qp ? JSON.parse('{' + arr.join() + '}', function (key, value) { return key === "" ? value : decodeURIComponent(value); }) : {};
 
-    if (document.readyState !== 'loading') run();
-    else document.addEventListener('DOMContentLoaded', function () { run(); });
+	console.log(arr, qp, qp.code);
+	document.getElementById("code").textContent = qp.code;
+	qp.code = "";
+	if (qp.code) fetch("https://api.schwabapi.com/v1/oauth/token", {method:'POST', 
+		body:new URLSearchParams({"grant_type":"authorization_code", 
+			code:qp.code, "client_id":D('api').value, "redirect_uri":""}),
+		headers:{Authorization:D('hash').value, cache:'no-cache'}}).then(function(data) { 
+		if (data) {
+			console.log(data, data.access_token, data.refresh_token);
+			D('refresh').textContent = data.refresh_token;
+		}
+	});
+}
+
+if (document.readyState !== 'loading') run();
+else document.addEventListener('DOMContentLoaded', run);
 </script>
