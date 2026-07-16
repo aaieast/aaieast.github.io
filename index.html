@@ -44,11 +44,13 @@ function run() {
 	if (qp.code) fetch("https://api.schwabapi.com/v1/oauth/token", {method:'POST', 
 		body:new URLSearchParams({"grant_type":"authorization_code", 
 			code:qp.code, "client_id":D('api').value, "redirect_uri":""}),
-		headers:{Authorization:D('hash').value, cache:'no-cache'}}).then(function(data) { 
-		if (data) {
-			console.log(data, data.access_token, data.refresh_token);
-			D('refresh').textContent = data.refresh_token;
-		}
+		headers:{Authorization:D('hash').value, cache:'no-cache'}}).then(function(response) { 
+		response.json().then(function(data) {
+			if (data) {
+				console.log(data, data.access_token, data.refresh_token);
+				D('refresh').textContent = data.refresh_token;
+			}
+		});
 	});
 }
 
