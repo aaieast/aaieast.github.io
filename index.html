@@ -8,10 +8,13 @@ Hash: <input id="hash">
 <br><br>
 URL: <input id="URL">
 <br><br>
-Refresh: 
+Refresh: <button id="saveKey">Copy</button>
 <br><span id="refresh"></span>
 
 <script>'use strict';
+var refreshKey = "";
+D('saveKey').onclick = function() { navigator.clipboard.writeText(refreshKey); }
+
 function D(str) { return document.getElementById(str); }
 D('api').value = localStorage.getItem('api') || "";
 D('hash').value = localStorage.getItem('hash') || "";
@@ -63,6 +66,7 @@ function run() {
 			if (data) {
 				console.log(data, data.access_token, data.refresh_token);
 				D('refresh').textContent = data.refresh_token;
+				refreshKey = data.refresh_token;;
 			}
 		});
 	});
